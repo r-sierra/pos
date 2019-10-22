@@ -44,6 +44,12 @@ odoo.define('pos_access_right.pos_access_right', function (require) {
         } else {
             $(".button.pay").removeClass('pos-disabled-mode');
         }
+        if (user.groups_id.indexOf(
+            this.pos.config.group_change_pricelist_id[0]) === -1) {
+            $(".control-button.o_pricelist_button").addClass('pos-disabled-mode');
+        } else {
+            $(".control-button.o_pricelist_button").removeClass('pos-disabled-mode');
+        }
     };
 
     // Overload 'set_cashier' function to display correctly
@@ -170,6 +176,42 @@ odoo.define('pos_access_right.pos_access_right', function (require) {
                     button_pay_click_handler();
                 }
             });
+        },
+    });
+
+    screens.set_pricelist_button.include({
+
+        /**
+         * To display correctly unauthorized function at the beginning of the
+           session, based on current user
+         */
+        start: function () {
+            this._super();
+            this.gui.display_access_right(this.pos.get_cashier());
+        },
+
+        /**
+         * To display correctly unauthorized function when re-rendering
+         */
+        renderElement: function () {
+            var self = this;
+            this._super();
+            this.gui.display_access_right(this.pos.get_cashier());
+        },
+
+        /**
+         * Block 'Pricelist' button if user doesn't belong to the correct group
+         */
+        button_click: function () {
+            if (this.pos.get_cashier().groups_id.indexOf(
+                this.pos.config.group_change_pricelist_id[0]) === -1) {
+                this.gui.show_popup('error', {
+                    'title': _t('Change Pricelist - Unauthorized function'),
+                    'body':  _t('Please ask your manager to do it.'),
+                });
+            } else {
+                this._super();
+            }
         },
     });
 

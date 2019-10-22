@@ -36,4 +36,8 @@
         <field name="category_id" ref="base.module_category_usability"/>
     </record>
 
+    <record id="group_change_pricelist" model="res.groups">
+        <field name="name">Point of Sale - Change Pricelist</field>
+        <field name="category_id" ref="base.module_category_usability"/>
+    </record>
 </odoo>
