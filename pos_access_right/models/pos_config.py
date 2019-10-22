@@ -57,6 +57,13 @@ class PosConfig(models.Model):
         help="This field is there to pass the id of the 'PoS - Allow Pricelist"
         " Change' Group to the Point of Sale Frontend.")
 
+    group_change_fiscal_position_id = fields.Many2one(
+        comodel_name='res.groups',
+        compute='_compute_group_change_fiscal_position_id',
+        string='Point of Sale - Allow Fiscal Position Change',
+        help="This field is there to pass the id of the 'PoS - Allow Fiscal"
+        " Position Change' Group to the Point of Sale Frontend.")
+
     @api.multi
     def _compute_group_negative_qty_id(self):
         for config in self:
@@ -98,3 +105,9 @@ class PosConfig(models.Model):
         for config in self:
             self.group_change_pricelist_id = \
                 self.env.ref('pos_access_right.group_change_pricelist')
+
+    @api.multi
+    def _compute_group_change_fiscal_position_id(self):
+        for config in self:
+            self.group_change_fiscal_position_id = \
+                self.env.ref('pos_access_right.group_change_fiscal_position')
