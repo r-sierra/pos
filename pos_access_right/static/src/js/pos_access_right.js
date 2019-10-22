@@ -46,9 +46,11 @@ odoo.define('pos_access_right.pos_access_right', function (require) {
         }
         if (user.groups_id.indexOf(
             this.pos.config.group_change_pricelist_id[0]) === -1) {
-            $(".control-button.o_pricelist_button").addClass('pos-disabled-mode');
+            $(".control-button.o_pricelist_button").addClass(
+                'pos-disabled-mode');
         } else {
-            $(".control-button.o_pricelist_button").removeClass('pos-disabled-mode');
+            $(".control-button.o_pricelist_button").removeClass(
+                'pos-disabled-mode');
         }
         if (user.groups_id.indexOf(
             this.pos.config.group_change_fiscal_position_id[0]) === -1) {
@@ -202,7 +204,6 @@ odoo.define('pos_access_right.pos_access_right', function (require) {
          * To display correctly unauthorized function when re-rendering
          */
         renderElement: function () {
-            var self = this;
             this._super();
             this.gui.display_access_right(this.pos.get_cashier());
         },
