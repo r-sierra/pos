@@ -24,6 +24,10 @@
                             <strong>Closing Date</strong>:<br/>
                             <span t-field="o.stop_at"/>
                         </div>
+                        <div class="col-auto mw-100 mb-3">
+                            <strong>Status</strong>:<br/>
+                            <span t-field="o.state"/>
+                        </div>
                     </div>
 
                     <h4>Statement Summary</h4>
