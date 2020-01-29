@@ -36,9 +36,6 @@
                         <thead>
                             <tr>
                                 <th>
-                                    <strong>Reference</strong>
-                                </th>
-                                <th>
                                     <strong>Journal</strong>
                                 </th>
                                 <th class="text-right">
@@ -56,14 +53,10 @@
                                 <th class="text-right" groups="base.group_multi_currency">
                                     <strong>Currency</strong>
                                 </th>
-                                <th class="text-right">
-                                    <strong>Status</strong>
-                                </th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr t-foreach="o.statement_ids" t-as="statement">
-                                <td><span t-field="statement.name"/></td>
                                 <td><span t-field="statement.journal_id"/></td>
                                 <td class="text-right">
                                     <span t-field="statement.balance_start"
@@ -84,7 +77,6 @@
                                 <td class="text-right" groups="base.group_multi_currency">
                                     <span t-field="statement.currency_id"/>
                                 </td>
-                                <td class="text-right"><span t-field="statement.state"/></td>
                             </tr>
                         </tbody>
                     </table>
@@ -97,9 +89,7 @@
                                 <tr>
                                     <th>Date</th>
                                     <th>Description</th>
-                                    <th>Reference</th>
                                     <th>Partner</th>
-                                    <th>Account</th>
                                     <th class="text-right">Amount</th>
                                 </tr>
                             </thead>
@@ -107,9 +97,7 @@
                                 <tr t-foreach="statement.line_ids" t-as="line">
                                     <td><span t-field="line.date"/></td>
                                     <td><span t-field="line.name"/></td>
-                                    <td><span t-field="line.ref"/></td>
                                     <td><span t-field="line.partner_id"/></td>
-                                    <td><span t-field="line.account_id"/></td>
                                     <td class="text-right">
                                         <span t-field="line.amount"
                                             t-field-options='{"widget": "monetary", "display_currency": "statement.currency_id"}'/>
