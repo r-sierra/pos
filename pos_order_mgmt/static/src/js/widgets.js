@@ -12,7 +12,7 @@ odoo.define('pos_order_mgmt.widgets', function (require) {
     var screens = require('point_of_sale.screens');
     var gui = require('point_of_sale.gui');
     var chrome = require('point_of_sale.chrome');
-    var pos = require('point_of_sale.models');
+    var models = require('point_of_sale.models');
 
     var QWeb = core.qweb;
     var ScreenWidget = screens.ScreenWidget;
@@ -215,7 +215,7 @@ odoo.define('pos_order_mgmt.widgets', function (require) {
 
         _prepare_order_from_order_data: function (order_data, action) {
             var self = this;
-            var order = new pos.Order({}, {
+            var order = new models.Order({}, {
                 pos: this.pos,
             });
 
@@ -308,20 +308,44 @@ odoo.define('pos_order_mgmt.widgets', function (require) {
                 if (_.isUndefined(product)) {
                     self.unknown_products.push(String(line.product_id));
                 } else {
-                    var qty = line.qty;
-                    if (['return'].indexOf(action) !== -1) {
-                        // Invert line quantities
-                        qty *= -1;
-                    }
                     // Create a new order line
-                    order.add_product(product, {
-                        price: line.price_unit,
-                        quantity: qty,
-                        discount: line.discount,
-                        merge: false,
-                    });
+                    order.add_product(product,
+                        self._prepare_product_options_from_orderline_data(
+                            order, line, action));
+                    // Restore lot information.
+                    if (['return'].indexOf(action) !== -1) {
+                        var orderline = order.get_selected_orderline()
+                        if (orderline.pack_lot_lines) {
+                            _.each(orderline.return_pack_lot_names, function(lot_name) {
+                                orderline.pack_lot_lines.add(new models.Packlotline(
+                                    {'lot_name': lot_name}, {'order_line': orderline}
+                                ));
+                            })
+                            orderline.trigger('change', orderline);
+                        }
+                    }
                 }
             });
+        },
+
+        _prepare_product_options_from_orderline_data: function (
+            order, line, action) {
+
+            var qty = line.qty;
+            if (['return'].indexOf(action) !== -1) {
+                // Invert line quantities
+                qty *= -1;
+            }
+            return {
+                price: line.price_unit,
+                quantity: qty,
+                discount: line.discount,
+                merge: false,
+                extras: {
+                    return_pack_lot_names: line.pack_lot_names,
+                },
+            }
+
         },
 
         load_order_data: function (order_id) {

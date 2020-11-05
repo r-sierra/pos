@@ -72,12 +72,15 @@ class PosOrder(models.Model):
         for line in self.lines:
             qty = - line.max_returnable_qty([])
             if qty != 0:
-                copy_line = line.copy()
-                copy_line.write({
-                    'order_id': new_order.id,
-                    'returned_line_id': line.id,
-                    'qty': qty,
-                })
+                copy_line = line.copy(
+                    {
+                        'order_id': new_order.id,
+                        'returned_line_id': line.id,
+                        'qty': qty,
+                    }
+                )
+                copy_line._onchange_amount_line_all()
+        new_order._onchange_amount_all()
         return res
 
     def partial_refund(self, partial_return_wizard):
@@ -87,12 +90,15 @@ class PosOrder(models.Model):
         for wizard_line in partial_return_wizard.line_ids:
             qty = -wizard_line.qty
             if qty != 0:
-                copy_line = wizard_line.pos_order_line_id.copy()
-                copy_line.write({
-                    'order_id': new_order.id,
-                    'returned_line_id': wizard_line.pos_order_line_id.id,
-                    'qty': qty,
-                })
+                copy_line = wizard_line.pos_order_line_id.copy(
+                    {
+                        'order_id': new_order.id,
+                        'returned_line_id': wizard_line.pos_order_line_id.id,
+                        'qty': qty,
+                    }
+                )
+                copy_line._onchange_amount_line_all()
+        new_order._onchange_amount_all()
         return res
 
     def action_pos_order_paid(self):
@@ -125,9 +131,11 @@ class PosOrder(models.Model):
     def create_picking(self):
         """Odoo bases return picking if the quantities are negative, but it's
         not linked to the original one"""
-        res = super(PosOrder, self.filtered(lambda x: not x.returned_order_id)
-                    ).create_picking()
-        for order in self.filtered('returned_order_id'):
+        orders = self.filtered(
+            lambda x: not x.returned_order_id
+            or not x.returned_order_id.picking_id)
+        res = super(PosOrder, orders).create_picking()
+        for order in self - orders:
             wizard = order._create_picking_return()
             res = wizard.create_returns()
             order.write({'picking_id': res['res_id']})
